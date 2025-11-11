@@ -37,35 +37,47 @@ class History(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
 # ---------------- Load Model Artifacts ----------------
+import os
 import pickle
 
-model = pickle.load(open("D:\\projects\\Healthcare-Assistant\\artifacts\\model.pkl", "rb"))
-le = pickle.load(open("D:\projects\\Healthcare-Assistant\\artifacts\\label_encoder.pkl", "rb"))
-top_features = pickle.load(open("D:\\projects\Healthcare-Assistant\\artifacts\\top_features.pkl", "rb"))
+# Define paths relative to the project root
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "artifacts", "model.pkl")
+LE_PATH = os.path.join(BASE_DIR, "artifacts", "label_encoder.pkl")
+FEATURES_PATH = os.path.join(BASE_DIR, "artifacts", "top_features.pkl")
 
-model = le = top_features = None
+# Initialize variables
+model = None
+le = None
+top_features = None
+
 def load_artifacts():
     global model, le, top_features
+
     try:
-        with open(model, "rb") as f:
+        with open(MODEL_PATH, "rb") as f:
             model = pickle.load(f)
         print("✅ Model loaded")
     except Exception as e:
         print("⚠️ Could not load model:", e)
+
     try:
-        with open(le, "rb") as f:
+        with open(LE_PATH, "rb") as f:
             le = pickle.load(f)
         print("✅ LabelEncoder loaded")
     except Exception as e:
         print("⚠️ Could not load label encoder:", e)
+
     try:
-        with open(top_features, "rb") as f:
-            top_features = list(pickle.load(f))
+        with open(FEATURES_PATH, "rb") as f:
+            top_features = pickle.load(f)
         print(f"✅ {len(top_features)} features loaded")
     except Exception as e:
         print("⚠️ Could not load features:", e)
 
+# Load everything
 load_artifacts()
+
 
 # ---------------- Helper: fuzzy mapping ----------------
 def map_free_text_to_symptoms(text, symptom_pool, score_cutoff=65):
