@@ -1,0 +1,6 @@
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.3
+werkzeug==2.3.7
+numpy
+rapidfuzz
+scikit-learn

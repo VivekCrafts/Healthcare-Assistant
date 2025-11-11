@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Prediction Result — Health Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-white min-h-screen">
+  <div class="max-w-3xl mx-auto p-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="h-10 w-10 rounded-full shadow" onerror="this.style.display='none'">
+        <h1 class="text-2xl font-semibold text-gray-800">Health Assistant</h1>
+      </div>
+      <div class="space-x-4">
+        <a href="{{ url_for('home') }}" class="text-sm text-indigo-600 hover:underline">Home</a>
+        <a href="{{ url_for('history') }}" class="text-sm text-indigo-600 hover:underline">History</a>
+        <a href="{{ url_for('logout') }}" class="text-sm text-red-600 hover:underline">Logout</a>
+      </div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+      <h2 class="text-xl font-semibold mb-2 text-gray-800 flex items-center gap-2">
+        🩺 Prediction Result
+      </h2>
+
+      <!-- Main prediction -->
+      <div class="text-3xl font-bold mb-4 text-indigo-700 animate-pulse">
+        {{ prediction }}
+      </div>
+
+      <!-- Confidence message -->
+      {% if top3 and top3[0].prob is not none %}
+        {% set conf = top3[0].prob %}
+        {% if conf >= 0.8 %}
+          <div class="p-3 rounded-lg bg-green-50 text-green-800 mb-4 border border-green-100">
+            ✅ High confidence ({{ (conf*100)|round(1) }}%). This prediction is likely accurate — consider consulting a healthcare provider.
+          </div>
+        {% elif conf >= 0.5 %}
+          <div class="p-3 rounded-lg bg-yellow-50 text-yellow-800 mb-4 border border-yellow-100">
+            ⚠️ Moderate confidence ({{ (conf*100)|round(1) }}%). Monitor your symptoms and seek care if they worsen.
+          </div>
+        {% else %}
+          <div class="p-3 rounded-lg bg-red-50 text-red-700 mb-4 border border-red-100">
+            ⚠️ Low confidence ({{ (conf*100)|round(1) }}%). Consider consulting a medical professional for a precise evaluation.
+          </div>
+        {% endif %}
+      {% endif %}
+
+      <!-- Top 3 Predictions -->
+      <h3 class="text-lg font-semibold mb-2 text-gray-700">Top Predictions</h3>
+      <ul class="divide-y divide-gray-200 mb-4">
+        {% for p in top3 %}
+          <li class="py-2 flex justify-between items-center">
+            <span class="capitalize text-gray-800 font-medium">{{ p.label }}</span>
+            {% if p.prob %}
+              <span class="font-semibold text-indigo-700">{{ (p.prob * 100) | round(2) }}%</span>
+            {% else %}
+              <span class="text-gray-500 italic">N/A</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Symptoms -->
+      <h4 class="text-lg font-semibold mb-2 text-gray-700">Symptoms Considered</h4>
+      <div class="flex flex-wrap gap-2 mb-6">
+        {% for s in symptoms %}
+          <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm border border-indigo-100">
+            {{ s.replace('_',' ') }}
+          </span>
+        {% endfor %}
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="{{ url_for('home') }}" class="px-5 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+          🔍 New Prediction
+        </a>
+        <a href="{{ url_for('history') }}" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+          📜 View History
+        </a>
+        <a href="{{ url_for('logout') }}" class="px-5 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
+          🚪 Logout
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-10 text-gray-500 text-sm">
+      © {{ 2025 }} Health Assistant · For informational purposes only
+    </div>
+  </div>
+</body>
+</html>

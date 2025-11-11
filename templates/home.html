@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Home — Health Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-5xl mx-auto p-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="h-10 w-10 rounded-full shadow" onerror="this.style.display='none'">
+        <h1 class="text-2xl font-semibold text-gray-800">Health Assistant</h1>
+      </div>
+      <div class="space-x-4">
+        <a href="{{ url_for('history') }}" class="text-sm text-indigo-600 hover:underline">History</a>
+        <a href="{{ url_for('logout') }}" class="text-sm text-red-600 hover:underline">Logout</a>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% if missing %}
+      <div class="bg-yellow-50 text-yellow-700 p-3 rounded mb-4 shadow">⚠️ Model artifacts not loaded. Please add files to <code>/artifacts</code>.</div>
+    {% endif %}
+
+    {% for cat, msg in get_flashed_messages(with_categories=true) %}
+      <div class="p-3 mb-2 rounded text-sm shadow {{ 'bg-green-100 text-green-800' if cat=='success' else 'bg-red-100 text-red-800' }}">
+        {{ msg }}
+      </div>
+    {% endfor %}
+
+    <!-- Main card -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
+      <form method="POST" class="space-y-6">
+        <!-- Text area input -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Describe your symptoms (free text)</label>
+          <textarea name="symptom_text" rows="3" class="w-full border p-3 rounded-lg focus:ring focus:ring-indigo-200" placeholder="e.g., fever, sore throat, cough"></textarea>
+        </div>
+
+        <!-- Symptom list -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Or select symptoms below:</label>
+          <input id="symptomSearch" type="text" placeholder="🔍 Search symptoms..." class="w-full border p-2 mb-3 rounded focus:ring focus:ring-indigo-200" />
+          <div id="symptomList" class="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-64 overflow-auto border p-2 rounded-lg bg-gray-50">
+            {% for s in symptoms %}
+              <label class="flex items-center space-x-2 text-sm p-2 rounded symptom-box bg-white border hover:bg-indigo-50 cursor-pointer">
+                <input type="checkbox" name="symptoms" value="{{ s }}">
+                <span>{{ s.replace('_',' ') }}</span>
+              </label>
+            {% endfor %}
+            {% if not symptoms %}
+              <p class="text-sm text-gray-500 col-span-4">No symptoms available. Please load model artifacts.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex justify-center">
+          <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg shadow hover:bg-indigo-700 transition">
+            Predict
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom script -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
