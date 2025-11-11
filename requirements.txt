@@ -6,3 +6,4 @@ rapidfuzz
 scikit-learn
 xgboost
 pytz
+gunicorn
